@@ -1,13 +1,12 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
-
 { config, pkgs, ... }:
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [
       ./hardware-configuration.nix
+      <agenix/modules/age.nix>
+      ./cloudflare.nix
+      ./agenix.nix
     ];
 
   # Bootloader.
@@ -49,14 +48,19 @@
       description = "Admin";
       extraGroups = [ "networkmanager" "wheel" ];
       packages = with pkgs; [];
+      hashedPasswordFile = "" + builtins.toString(config.age.secrets.adminPassword.file);
     };
     users.hoster = {
       isNormalUser = true;
       description = "Services Hoster";
       extraGroups = [];
       packages = with pkgs; [];
+      hashedPasswordFile = builtins.toString(config.age.secrets.hosterPassword.file);
     };
   };
+
+  # Automatically log in at the virtual consoles.
+  services.getty.autologinUser = "hoster";
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -83,6 +87,8 @@
      thermald
      stow
      avahi
+     cloudflared
+     (pkgs.callPackage <agenix/pkgs/agenix.nix> {})
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -120,6 +126,16 @@
       addresses = true;
     };
   };
+
+  # services.cloudflared = {
+  #  enable = true;
+  #  user = "hoster";
+  #  tunnels."nixos-server" = {
+  #    credentialsFile = "${config.users.users.hoster.home}/.cloudflared/nixos-server.json";
+  #    default = "http_status:404";
+  #    ingress."b0x207.dev" = "http://localhost:3000";
+  #  };
+  #};
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
