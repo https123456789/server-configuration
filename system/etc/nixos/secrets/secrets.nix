@@ -6,7 +6,5 @@ let
   users = [ hoster_user_key admin_user_key ];
   systems = [ server_key ];
 in {
-  "adminPassword.age".publicKeys = systems ++ [ admin_user_key ];
-  "hosterPassword.age".publicKeys = systems ++ [ admin_user_key ];
   "cloudflare.age".publicKeys = users ++ systems;
 }

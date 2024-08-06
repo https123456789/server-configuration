@@ -3,7 +3,7 @@
 {
   imports =
     [
-      ./hardware-configuration.nix
+      /etc/nixos/hardware-configuration.nix # each machine will have a different hardware configuration
       <agenix/modules/age.nix>
       ./cloudflare.nix
       ./agenix.nix
@@ -25,7 +25,6 @@
 
   # Set your time zone.
   time.timeZone = "America/Los_Angeles";
-
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
 
@@ -48,14 +47,12 @@
       description = "Admin";
       extraGroups = [ "networkmanager" "wheel" ];
       packages = with pkgs; [];
-      hashedPasswordFile = "" + builtins.toString(config.age.secrets.adminPassword.file);
     };
     users.hoster = {
       isNormalUser = true;
       description = "Services Hoster";
       extraGroups = [];
       packages = with pkgs; [];
-      hashedPasswordFile = builtins.toString(config.age.secrets.hosterPassword.file);
     };
   };
 
