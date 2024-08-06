@@ -14,6 +14,13 @@ git remote add origin https://github.com/https123456789/server-configuration.git
 git pull origin main
 ```
 
+## Add Nix Channels
+
+```
+sudo nix-channel --add https://github.com/ryantm/agenix/archive/main.tar.gz agenix
+sudo nix-channel --update
+```
+
 ## Apply The Configuration
 
 ```
