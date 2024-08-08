@@ -7,6 +7,10 @@
       <agenix/modules/age.nix>
       ./cloudflare.nix
       ./agenix.nix
+
+      # Services
+      /etc/nixos/services/personal-website.nix
+      /etc/nixos/services/miniflux.nix
     ];
 
   # Bootloader.
@@ -45,14 +49,21 @@
     users.admin = {
       isNormalUser = true;
       description = "Admin";
-      extraGroups = [ "networkmanager" "wheel" ];
+      extraGroups = [ "networkmanager" "wheel" "docker" ];
       packages = with pkgs; [];
     };
     users.hoster = {
       isNormalUser = true;
       description = "Services Hoster";
-      extraGroups = [];
+      extraGroups = [ "docker" ];
       packages = with pkgs; [];
+    };
+    users.nixremote = {
+      isNormalUser = true;
+      description = "Nix Remote Builder";
+      extraGroups=  [];
+      packages = with pkgs; [];
+      createHome = true;
     };
   };
 
@@ -86,6 +97,7 @@
      avahi
      cloudflared
      (pkgs.callPackage <agenix/pkgs/agenix.nix> {})
+     docker-compose
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -124,16 +136,6 @@
     };
   };
 
-  # services.cloudflared = {
-  #  enable = true;
-  #  user = "hoster";
-  #  tunnels."nixos-server" = {
-  #    credentialsFile = "${config.users.users.hoster.home}/.cloudflared/nixos-server.json";
-  #    default = "http_status:404";
-  #    ingress."b0x207.dev" = "http://localhost:3000";
-  #  };
-  #};
-
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
@@ -152,5 +154,8 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.05"; # Did you read the comment?
+
+  # Docker
+  virtualisation.docker.enable = true;
 
 }
